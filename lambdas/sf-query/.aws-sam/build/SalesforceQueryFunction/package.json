@@ -1,0 +1,18 @@
+{
+  "name": "sf-get-connector",
+  "version": "1.0.0",
+  "description": "Salesforce Rest API query connector for Lambda",
+  "type": "module",
+  "main": "app.mjs",
+  "scripts": {
+    "start": "sam local invoke SalesforceQueryFunction -e events/event.json"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.497.0",
+    "dotenv": "^16.3.1",
+    "jsforce": "^3.7.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
+
+

@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SF Get Connector
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x
+Resources:
+  SalesforceQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SalesforceQueryFunction
+      Handler: app.handler
+    Metadata:
+      SamResourceId: SalesforceQueryFunction
