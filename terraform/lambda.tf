@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "${var.lambda_name}-exec-role"
+  name = "sf-query-${var.app_lifecycle}-exec-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -14,7 +14,7 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 resource "aws_iam_policy" "lambda_secrets_policy" {
-  name = "${var.lambda_name}-secrets-policy"
+  name = "sf-query-${var.app_lifecycle}-secrets-policy"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -31,33 +31,23 @@ resource "aws_iam_role_policy_attachment" "secrets_attach" {
   policy_arn = aws_iam_policy.lambda_secrets_policy.arn
 }
 
-resource "null_resource" "build_lambda" {
-  provisioner "local-exec" {
-    command = <<EOT
-      cd ${var.lambda_source_path}
-      npm ci
-      zip -r ../../lambda.zip . -x "events/*" -x "tests/*" -x "*.md" -x "samconfig.toml"
-    EOT
-  }
-
-  triggers = {
-    always_run = timestamp()
-  }
+data "archive_file" "sf_query_lambda_zip" {
+  type        = "zip"
+  source_dir  = "../lambdas/sf-query"
+  output_path = "${path.module}/sf-query-${var.app_lifecycle}.zip"
 }
 
-resource "aws_lambda_function" "lambda_function" {
-  function_name = var.lambda_name
-  runtime       = var.lambda_runtime
+resource "aws_lambda_function" "sf_query_lambda_function" {
+  function_name = "sf-query-${var.app_lifecycle}"
+  runtime       = "nodejs18.x"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = var.lambda_handler
-  timeout       = var.lambda_timeout
-  memory_size   = var.lambda_memory_size
+  handler       = app.handler
+  timeout       = 30
 
-  filename         = "${path.module}/../lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../lambda.zip")
+  filename         = data.archive_file.sf_query_lambda_zip.output_path
+  source_code_hash = filebase64sha256(data.archive_file.sf_query_lambda_zip.output_path)
 
   depends_on = [
-    aws_iam_role_policy_attachment.secrets_attach,
-    null_resource.build_lambda
+    aws_iam_role_policy_attachment.secrets_attach
   ]
 }
