@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Salesforce SOQL Query Lambda using JWT Bearer Auth
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x
+
+Resources:
+  SalesforceQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: app.handler
+      Events:
+        SalesforceInvoke:
+          Type: Api
+          Properties:
+            Path: /query
+            Method: post
