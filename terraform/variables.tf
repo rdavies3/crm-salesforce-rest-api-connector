@@ -12,7 +12,11 @@ variable "secrets_manager_arn" {
   type        = string
   description = "ARN of the secret this Lambda will access"
 }
-variable "app_lifecycle" {
+variable "environment" {
   type        = string
   description = "Where we are in the life of the app."
+}
+variable "product_key" {
+  type        = string
+  description = "ASU product key."
 }

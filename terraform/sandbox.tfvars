@@ -1,5 +1,5 @@
 # application
-app_lifecycle = "sandbox"
+environment = "sandbox"
 
 # providers
 aws_account_number  = "982081057374"

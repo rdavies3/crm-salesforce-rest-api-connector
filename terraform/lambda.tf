@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "sf-query-${var.app_lifecycle}-exec-role"
+  name = "sf-query-${var.environment}-exec-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -14,7 +14,7 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 resource "aws_iam_policy" "lambda_secrets_policy" {
-  name = "sf-query-${var.app_lifecycle}-secrets-policy"
+  name = "sf-query-${var.environment}-secrets-policy"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -34,14 +34,14 @@ resource "aws_iam_role_policy_attachment" "secrets_attach" {
 data "archive_file" "sf_query_lambda_zip" {
   type        = "zip"
   source_dir  = "../lambdas/sf-query"
-  output_path = "${path.module}/sf-query-${var.app_lifecycle}.zip"
+  output_path = "${path.module}/sf-query-${var.environment}.zip"
 }
 
 resource "aws_lambda_function" "sf_query_lambda_function" {
-  function_name = "sf-query-${var.app_lifecycle}"
+  function_name = "sf-query-${var.environment}"
   runtime       = "nodejs18.x"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = app.handler
+  handler       = "app.handler"
   timeout       = 30
 
   filename         = data.archive_file.sf_query_lambda_zip.output_path
