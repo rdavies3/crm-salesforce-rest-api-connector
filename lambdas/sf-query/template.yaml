@@ -13,12 +13,8 @@ Resources:
     Properties:
       CodeUri: .
       Handler: app.handler
-      Events:
-        SalesforceInvoke:
-          Type: Api
-          Properties:
-            Path: /query
-            Method: post
+      Runtime: nodejs18.x
+      Timeout: 10
       Layers:
         - !Ref SalesforceLayer
 
