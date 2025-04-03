@@ -1,4 +1,4 @@
-import { authenticateSalesforce } from './opt/nodejs/salesforce.mjs';
+import { authenticateSalesforce } from '/opt/salesforce.mjs';
 
 export const handler = async (event) => {
   try {

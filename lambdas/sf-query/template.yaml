@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Salesforce SOQL Query Lambda using JWT Bearer Auth
+Description: Salesforce REST API Query Lambda using JWT Bearer Auth
 
 Globals:
   Function:
@@ -19,3 +19,14 @@ Resources:
           Properties:
             Path: /query
             Method: post
+      Layers:
+        - !Ref SalesforceLayer
+
+  SalesforceLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: salesforce-lib
+      Description: Shared Salesforce auth and dependencies
+      ContentUri: ../../layers/salesforce-lib
+      CompatibleRuntimes:
+        - nodejs18.x

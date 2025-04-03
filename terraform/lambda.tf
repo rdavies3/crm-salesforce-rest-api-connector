@@ -31,10 +31,20 @@ resource "aws_iam_role_policy_attachment" "secrets_attach" {
   policy_arn = aws_iam_policy.lambda_secrets_policy.arn
 }
 
-data "archive_file" "sf_query_lambda_zip" {
-  type        = "zip"
-  source_dir  = "../lambdas/sf-query"
-  output_path = "${path.module}/sf-query-${var.environment}.zip"
+locals {
+  lambda_name = "sf-query-${var.environment}"
+  zip_file    = "${path.module}/${local.lambda_name}.zip"
+}
+
+resource "null_resource" "build_lambda_zip" {
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command     = "./build-lambda-zip.sh ${var.environment}"
+    working_dir = path.module
+  }
 }
 
 resource "aws_lambda_function" "sf_query_lambda_function" {
@@ -44,8 +54,8 @@ resource "aws_lambda_function" "sf_query_lambda_function" {
   handler       = "app.handler"
   timeout       = 30
 
-  filename         = data.archive_file.sf_query_lambda_zip.output_path
-  source_code_hash = filebase64sha256(data.archive_file.sf_query_lambda_zip.output_path)
+  filename         = local.zip_file
+  source_code_hash = filebase64sha256(local.zip_file)
 
   depends_on = [
     aws_iam_role_policy_attachment.secrets_attach

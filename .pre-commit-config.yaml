@@ -8,8 +8,15 @@ repos:
       - id: mixed-line-ending
       - id: check-json
       - id: check-yaml
+        exclude: lambdas/.*/template\.yaml
         args:
           - --allow-multiple-documents
+  - repo: https://github.com/aws-cloudformation/cfn-lint
+    rev: v0.85.0
+    hooks:
+      - id: cfn-lint
+        files: ^lambdas/.*/template\.yaml$
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.89.1
     hooks:
