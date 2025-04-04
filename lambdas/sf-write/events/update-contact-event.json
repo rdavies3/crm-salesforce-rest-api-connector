@@ -1,0 +1,7 @@
+{
+    "httpMethod": "PATCH",
+    "pathParameters": {
+      "sobject": "Contact"
+    },
+    "body": "{\"Id\": \"003d000001C3lAPAAZ\", \"MailingCity\": \"Flagstaff\", \"MailingPostalCode\": \"86001\"}"
+  }

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Salesforce REST API Query Lambda using JWT Bearer Auth
+Description: Salesforce REST API Write Lambda
 
 Resources:
   SalesforceLayer:
@@ -14,12 +14,18 @@ Resources:
       CompatibleRuntimes:
         - nodejs18.x
 
-  SalesforceQueryFunction:
+  SalesforceWriteFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: app.handler
-      Timeout: 10
       Runtime: nodejs18.x
+      Timeout: 10
       Layers:
         - !Ref SalesforceLayer
+      Events:
+        WriteObject:
+          Type: Api
+          Properties:
+            Path: /{sobject}
+            Method: ANY

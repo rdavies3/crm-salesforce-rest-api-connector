@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { Connection } from "jsforce";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: '/opt/.env' });
 
 const secretsClient = new SecretsManagerClient({});
 

@@ -1,0 +1,10 @@
+{
+    "name": "sf-write",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "app.mjs",
+    "scripts": {
+        "start": "sam local start-api --template template.yaml"
+    },
+    "dependencies": {}
+}
