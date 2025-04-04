@@ -1,63 +1,65 @@
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "sf-query-${var.environment}-exec-role"
+locals {
+  query_zip        = "${path.module}/lambda/sf-query-${var.environment}.zip"
+  write_zip        = "${path.module}/lambda/sf-write-${var.environment}.zip"
+  layer_zip        = "${path.module}/lambda/salesforce-lib-layer-${var.environment}.zip"
+  layer_name       = "salesforce-lib-${var.environment}"
+  lambda_role_name = "lambda-exec-${var.environment}"
+}
+
+resource "aws_iam_role" "lambda_exec" {
+  name = local.lambda_role_name
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action = "sts:AssumeRole",
-      Effect = "Allow",
-      Principal = {
-        Service = "lambda.amazonaws.com"
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
       }
-    }]
+    ]
   })
 }
 
-resource "aws_iam_policy" "lambda_secrets_policy" {
-  name = "sf-query-${var.environment}-secrets-policy"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = ["secretsmanager:GetSecretValue"],
-      Resource = var.secrets_manager_arn
-    }]
-  })
+resource "aws_iam_role_policy_attachment" "lambda_basic_exec" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "secrets_attach" {
-  role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = aws_iam_policy.lambda_secrets_policy.arn
+resource "aws_iam_role_policy_attachment" "secrets_manager_access" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
-locals {
-  lambda_name = "sf-query-${var.environment}"
-  zip_file    = "${path.module}/${local.lambda_name}.zip"
+resource "aws_lambda_layer_version" "salesforce_layer" {
+  layer_name          = local.layer_name
+  filename            = local.layer_zip
+  compatible_runtimes = ["nodejs18.x"]
+  source_code_hash    = filebase64sha256(local.layer_zip)
 }
 
-resource "null_resource" "build_lambda_zip" {
-  triggers = {
-    always_run = timestamp()
-  }
+resource "aws_lambda_function" "sf_query" {
+  function_name    = "sf-query-${var.environment}"
+  handler          = "app.handler"
+  runtime          = "nodejs18.x"
+  timeout          = 10
+  filename         = local.query_zip
+  source_code_hash = filebase64sha256(local.query_zip)
 
-  provisioner "local-exec" {
-    command     = "./build-lambda-zip.sh ${var.environment}"
-    working_dir = path.module
-  }
+  role   = aws_iam_role.lambda_exec.arn
+  layers = [aws_lambda_layer_version.salesforce_layer.arn]
 }
 
-resource "aws_lambda_function" "sf_query_lambda_function" {
-  function_name = "sf-query-${var.environment}"
-  runtime       = "nodejs18.x"
-  role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "app.handler"
-  timeout       = 30
+resource "aws_lambda_function" "sf_write" {
+  function_name    = "sf-write-${var.environment}"
+  handler          = "app.handler"
+  runtime          = "nodejs18.x"
+  timeout          = 10
+  filename         = local.write_zip
+  source_code_hash = filebase64sha256(local.write_zip)
 
-  filename         = local.zip_file
-  source_code_hash = filebase64sha256(local.zip_file)
-
-  depends_on = [
-    aws_iam_role_policy_attachment.secrets_attach
-  ]
+  role   = aws_iam_role.lambda_exec.arn
+  layers = [aws_lambda_layer_version.salesforce_layer.arn]
 }
