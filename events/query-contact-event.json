@@ -1,0 +1,3 @@
+{
+  "query": "SELECT AccountId, Affiliation_Student__c, ASURite_ID__c, Birthdate, Country_of_Citizenship__r.Name, Country_of_Citizenship__r.ISO_Code__c, Country_of_Citizenship__c, CreatedDate, Email, EMPLID__c, Ethnicity__c, FirstName, Gender__c, Id, HomePhone, Language_Spoken_At_Home__c, LastName, Lead_Email__c, MailingAddress, Middle_Name__c, MobilePhone, OtherAddress, Parent_Email__c, Phone, Work_Phone__c, RecordTypeId, RecordType.Name, Self_Reported_ASU_Student_Alum__c, SSB_CRMSYSTEM_ACCT_ID__c, SMS_Phone__c FROM Contact WHERE EMPLID__c = '1200717444'"
+}

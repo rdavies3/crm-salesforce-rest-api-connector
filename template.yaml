@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Salesforce REST API Write Lambda
+Description: Salesforce REST API - Query and Write Lambdas with Shared Auth Layer
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x
 
 Resources:
   SalesforceLayer:
@@ -10,21 +15,33 @@ Resources:
     Properties:
       LayerName: salesforce-lib
       Description: Shared Salesforce auth and dependencies
-      ContentUri: ../../layers/salesforce-lib/nodejs
+      ContentUri: layers/salesforce-lib/nodejs
       CompatibleRuntimes:
         - nodejs18.x
+
+  SalesforceQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/sf-query
+      Handler: app.handler
+      Layers:
+        - !Ref SalesforceLayer
+      Events:
+        QueryAPI:
+          Type: Api
+          Properties:
+            Path: /query
+            Method: POST
 
   SalesforceWriteFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: lambdas/sf-write
       Handler: app.handler
-      Runtime: nodejs18.x
-      Timeout: 10
       Layers:
         - !Ref SalesforceLayer
       Events:
-        WriteObject:
+        WriteAPI:
           Type: Api
           Properties:
             Path: /{sobject}
