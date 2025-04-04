@@ -1,5 +1,6 @@
 # application
-environment = "sandbox"
+environment   = "sandbox"
+lambda_bucket = "my-dev-lambda-bucket"
 
 # providers
 aws_account_number  = "982081057374"

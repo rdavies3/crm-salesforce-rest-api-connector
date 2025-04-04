@@ -1,6 +1,5 @@
 terraform {
   required_version = ">= 1.4.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -15,15 +14,17 @@ terraform {
       version = ">= 3.1"
     }
   }
+  backend "local" {
+    path = "terraform.tfstate"
+  }
 }
-
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
+  profile = var.aws_profile
   default_tags { # tflint-ignore: aws_provider_missing_default_tags
     tags = module.product-tags.tags
   }
 }
-
 module "product-tags" {
   source  = "jfrog-cloud.devops.asu.edu/asu-terraform-modules__dco-terraform/product-tags/null"
   version = "~> 1.7"
