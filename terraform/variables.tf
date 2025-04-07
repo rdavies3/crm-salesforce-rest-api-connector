@@ -9,8 +9,9 @@ variable "aws_region" {
 }
 variable "aws_profile" {
   type        = string
-  description = "AWS CLI profile to use for authentication"
+  description = "AWS region where resources will be created"
 }
+### APP VARS ###
 variable "secrets_manager_arn" {
   type        = string
   description = "ARN of the secret this Lambda will access"
@@ -26,4 +27,8 @@ variable "product_key" {
 variable "lambda_bucket" {
   type        = string
   description = "S3 bucket for uploading Lambda zip artifacts"
+}
+variable "log_retention_in_days" {
+  type        = number
+  description = "Number of days to retain Lambda logs in CloudWatch"
 }

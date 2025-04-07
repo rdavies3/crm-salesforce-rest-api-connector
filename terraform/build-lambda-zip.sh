@@ -2,7 +2,9 @@
 set -e
 
 ENV=$1
-ZIP_DIR="terraform/lambda"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${SCRIPT_DIR}/.."
+ZIP_DIR="${SCRIPT_DIR}/lambda"
 
 if [[ -z "$ENV" ]]; then
   echo "Usage: $0 <environment>"
@@ -10,9 +12,11 @@ if [[ -z "$ENV" ]]; then
 fi
 
 mkdir -p "$ZIP_DIR"
+echo "[INFO] Zips will be saved to: $ZIP_DIR"
 
-echo "🔁 Packaging all Lambdas in ./lambdas/"
-for LAMBDA_DIR in lambdas/*; do
+
+echo "🔁 Packaging all Lambdas in $PROJECT_ROOT/lambdas/"
+for LAMBDA_DIR in "$PROJECT_ROOT/lambdas"/*; do
   if [[ -d "$LAMBDA_DIR" ]]; then
     LAMBDA_NAME=$(basename "$LAMBDA_DIR")
     ZIP_NAME="${LAMBDA_NAME}-${ENV}.zip"
@@ -43,8 +47,8 @@ for LAMBDA_DIR in lambdas/*; do
 done
 
 echo ""
-echo "🔁 Packaging shared layers in ./layers/"
-for LAYER_DIR in layers/*/nodejs; do
+echo "🔁 Packaging shared layers in .$PROJECT_ROOT/layers/"
+for LAYER_DIR in "$PROJECT_ROOT/layers"/*/nodejs; do
   if [[ -d "$LAYER_DIR" ]]; then
     LAYER_PARENT=$(basename "$(dirname "$LAYER_DIR")")
     ZIP_NAME="${LAYER_PARENT}-layer-${ENV}.zip"
@@ -54,7 +58,8 @@ for LAYER_DIR in layers/*/nodejs; do
 
     rm -f "$ZIP_PATH"
     cd "$LAYER_DIR"
-    zip -q -r "../../../$ZIP_PATH" .
+    zip -q -r "$ZIP_PATH" .
+
     cd - > /dev/null
 
     echo "✅ Done: $ZIP_NAME"
