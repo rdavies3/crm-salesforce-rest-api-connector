@@ -1,7 +1,7 @@
 {
-    "httpMethod": "POST",
-    "pathParameters": {
-      "sobject": "Contact"
-    },
-    "body": "{\"FirstName\": \"Rosalind\", \"LastName\": \"Davies\", \"Email\": \"rozy@oenologee.com\"}"
-  }
+  "httpMethod": "POST",
+  "pathParameters": {
+    "sobject": "Contact"
+  },
+  "payload": "{\"FirstName\": \"Rosalind\", \"LastName\": \"Davies\", \"Email\": \"rozy@oenologee.com\"}"
+}

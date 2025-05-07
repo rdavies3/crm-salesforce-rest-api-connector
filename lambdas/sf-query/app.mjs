@@ -5,7 +5,10 @@ export const handler = async (event) => {
     // Log the incoming event
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    const query = event.query;
+    let query = event.query;
+
+    // Log the extracted query
+    console.log('Extracted query:', query);
 
     if (!query && event.body) {
       try {

@@ -3,5 +3,5 @@
     "pathParameters": {
       "sobject": "Contact"
     },
-    "body": "{\"Id\": \"003d000001C3lAPAAZ\", \"MailingCity\": \"Fort Collins\", \"MailingPostalCode\": \"80526\"}"
+    "payload": "{\"Id\": \"003d000001C3lAPAAZ\", \"MailingCity\": \"Fort Collins\", \"MailingPostalCode\": \"80526\"}"
   }
