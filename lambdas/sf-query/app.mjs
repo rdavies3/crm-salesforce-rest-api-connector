@@ -7,16 +7,16 @@ export const handler = async (event) => {
 
     const query = event.query;
 
-    // Log the extracted query
-    console.log('Extracted query:', query);
-
-    if (!query) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing "query" field in event' }),
-      };
+    if (!query && event.body) {
+      try {
+        const parsed = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+        query = parsed.query;
+        // Log the parsed query
+        console.log('Parsed query:', query);
+      } catch (e) {
+        console.error("Invalid JSON body:", e);
+      }
     }
-
     const conn = await authenticateSalesforce();
 
     // Log before making the request
